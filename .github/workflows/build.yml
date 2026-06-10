@@ -30,6 +30,12 @@ jobs:
           # pywebview on Windows uses WinForms (pythonnet)
           pip install pythonnet
 
+      - name: Write version file
+        run: |
+          $tag = "${{ github.ref_name }}"
+          $ver = $tag -replace '^v',''
+          Set-Content -Path "VERSION" -Value $ver
+
       - name: Build EXE
         run: pyinstaller CiscoPhoneController.spec
 

@@ -15,11 +15,33 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import StreamingResponse, JSONResponse, Response
 
-VERSION = "1.1.0-dev"
+def _get_version():
+    """Try to read version from git describe, then VERSION file, then fall back."""
+    # 1. Try git describe (dev mode)
+    try:
+        import subprocess
+        result = subprocess.run(
+            ['git', 'describe', '--tags', '--always'],
+            capture_output=True, text=True, timeout=5,
+            cwd=os.path.dirname(os.path.abspath(__file__))
+        )
+        if result.returncode == 0:
+            return result.stdout.strip().lstrip('v')
+    except Exception:
+        pass
+    # 2. Try VERSION file (frozen exe)
+    for base in (_INTERNAL_DIR, _EXE_DIR):
+        vfile = os.path.join(base, 'VERSION')
+        if os.path.isfile(vfile):
+            try:
+                return open(vfile).read().strip().lstrip('v')
+            except Exception:
+                pass
+    # 3. Fallback
+    return "1.1.0-dev"
 
 # Determine base path (works both as script and frozen .exe)
 # In PyInstaller onefile mode, bundled files live in sys._MEIPASS (temp extraction dir)
-# The exe itself lives at sys.executable, but static/ etc are in _MEIPASS
 if getattr(sys, 'frozen', False):
     _INTERNAL_DIR = sys._MEIPASS          # where PyInstaller extracted bundled files
     _EXE_DIR = os.path.dirname(sys.executable)  # where the .exe sits (for logs)
@@ -28,6 +50,8 @@ else:
     _EXE_DIR = _INTERNAL_DIR
 
 STATIC_DIR = os.path.join(_INTERNAL_DIR, "static")
+
+VERSION = _get_version()
 
 # --- In-memory log buffer (no files on disk) ---
 MAX_LOG_LINES = 2000

@@ -12,6 +12,7 @@ a = Analysis(
     binaries=[],
     datas=[
         ('static', 'static'),
+        ('VERSION', '.'),
     ],
     hiddenimports=[
         'app',
