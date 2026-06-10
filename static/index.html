@@ -5,128 +5,201 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cisco Phone Controller</title>
 <style>
-* { box-sizing: border-box; }
+:root {
+    --blue: #0078d4;
+    --blue-dark: #005a9e;
+    --bg: #f0f2f5;
+    --card: #fff;
+    --border: #dde1e6;
+    --text: #1a1a1a;
+    --text-secondary: #666;
+    --success: #080;
+    --error: #c00;
+    --radius: 8px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin: 0; padding: 0;
-    background: #f5f5f5;
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
-/* Menu bar */
+/* ── Menu bar ── */
 .menu-bar {
-    background: #0078d4;
+    background: var(--blue);
     color: #fff;
     display: flex;
     align-items: center;
     padding: 0 16px;
-    height: 36px;
-    font-size: 0.85rem;
+    height: 40px;
+    flex-shrink: 0;
+    gap: 2px;
 }
 .menu-bar .app-title {
     font-weight: 700;
     font-size: 0.95rem;
     margin-right: auto;
 }
+.menu-bar .version {
+    font-size: 0.75rem;
+    opacity: 0.8;
+    margin-left: 6px;
+    font-weight: 400;
+}
+.menu-bar a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 0.8rem;
+    padding: 5px 10px;
+    border-radius: 3px;
+    opacity: 0.85;
+}
+.menu-bar a:hover { opacity: 1; background: rgba(255,255,255,0.12); }
 .menu-bar button {
     background: none;
     border: none;
     color: #fff;
     cursor: pointer;
-    padding: 6px 12px;
+    padding: 5px 10px;
     border-radius: 3px;
-    font-size: 0.85rem;
-    margin-left: 4px;
+    font-size: 0.8rem;
 }
 .menu-bar button:hover { background: rgba(255,255,255,0.15); }
 
-.content { padding: 20px; }
-#setup-view, #controller-view {
-    max-width: 1200px;
-    margin: 0 auto;
+/* ── Status bar ── */
+.status-strip {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 6px 20px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 32px;
 }
-#controller-view { display: none; }
+.status-strip .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--success);
+    flex-shrink: 0;
+}
+.status-strip.error .dot { background: var(--error); }
+.status-strip.error { color: var(--error); }
+.status-strip.success { color: var(--success); }
 
-/* Setup */
+/* ── Content area ── */
+.content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+/* ── Setup view ── */
+#setup-view {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
 .setup-box {
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 30px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px;
     max-width: 400px;
-    margin: 60px auto;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    width: 100%;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
 }
 .setup-box h2 {
-    margin-top: 0;
-    color: #333;
-    font-size: 1.4rem;
+    font-size: 1.3rem;
+    margin-bottom: 24px;
 }
 .setup-box label {
     display: block;
-    margin: 16px 0 6px;
-    font-size: 0.9rem;
-    color: #555;
+    margin: 14px 0 6px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
     font-weight: 600;
 }
 .setup-box input {
     width: 100%;
     padding: 10px 12px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border);
     border-radius: 4px;
     font-size: 1rem;
+    outline: none;
+    transition: border-color 0.15s;
 }
+.setup-box input:focus { border-color: var(--blue); }
 .setup-box button {
-    margin-top: 20px;
+    margin-top: 22px;
     width: 100%;
     padding: 12px;
     font-size: 1rem;
-    font-weight: bold;
+    font-weight: 700;
     color: #fff;
-    background: #0078d4;
+    background: var(--blue);
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    transition: background 0.15s;
 }
-.setup-box button:hover { background: #005a9e; }
+.setup-box button:hover { background: var(--blue-dark); }
 .setup-box button:disabled { background: #999; cursor: not-allowed; }
 .setup-box .error {
-    color: #c00;
+    color: var(--error);
     margin-top: 12px;
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     display: none;
 }
 
-/* Controller Layout */
-#controller-view .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-}
-#controller-view .header h2 { margin: 0; }
-#controller-view .header button {
-    padding: 8px 16px;
-    font-size: 0.9rem;
-    cursor: pointer;
+/* ── Controller view ── */
+#controller-view { display: none; }
+
+.controller-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 20px;
+    max-width: 1100px;
+    margin: 0 auto;
 }
 
-.main-layout {
+/* Left column: phone screen + keypad */
+.phone-col {
     display: flex;
-    gap: 20px;
+    flex-direction: column;
+    gap: 16px;
 }
-.left-col {
-    flex: 0 0 auto;
+
+.card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
 }
-.right-col {
-    flex: 1 1 auto;
+.card-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
 }
 
 /* Screen */
 #screen-wrap {
-    border: 1px solid #ccc;
+    border: 1px solid #333;
     background: #000;
     display: inline-block;
     position: relative;
+    border-radius: 2px;
+    overflow: hidden;
 }
 #screen-wrap img {
     width: 533px;
@@ -138,76 +211,106 @@ body {
 /* Keypad */
 .keypad {
     display: grid;
-    grid-template-columns: repeat(3, 70px);
-    gap: 8px;
-    margin-top: 16px;
+    grid-template-columns: repeat(3, 64px);
+    gap: 6px;
+    justify-content: center;
 }
 .keypad-btn {
-    width: 70px;
-    height: 61px;
-    background: #EFEFEF;
-    border: 1px solid #ccc;
+    width: 64px;
+    height: 56px;
+    background: #f7f8fa;
+    border: 1px solid var(--border);
     text-align: center;
-    line-height: 61px;
-    font-weight: bold;
-    color: #666;
+    line-height: 56px;
+    font-weight: 700;
+    color: var(--text);
     cursor: pointer;
     user-select: none;
-    border-radius: 3px;
+    border-radius: 4px;
+    font-size: 1.1rem;
+    transition: all 0.1s;
 }
-.keypad-btn:hover { background: #66CDAA; }
+.keypad-btn:hover { background: #66CDAA; border-color: #4db89a; }
+.keypad-btn:active { transform: scale(0.95); }
 
-/* Command Centre */
+/* Right column: commands + actions */
+.ctrl-col {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+}
+
+/* Command Centre grid */
 .cmd-grid {
     display: grid;
-    grid-template-columns: repeat(5, 140px);
-    gap: 8px;
-    margin-top: 16px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
 }
 .cmd-btn {
-    width: 140px;
-    height: 30px;
-    border: 1px solid #ccc;
+    height: 34px;
+    background: #f7f8fa;
+    border: 1px solid var(--border);
     text-align: center;
-    line-height: 30px;
-    font-weight: bold;
-    color: #666;
+    line-height: 34px;
+    font-weight: 700;
+    font-size: 0.82rem;
+    color: var(--text);
     cursor: pointer;
     user-select: none;
-    border-radius: 3px;
+    border-radius: 4px;
+    transition: all 0.1s;
 }
-.cmd-btn:hover { background: #66CDAA; }
+.cmd-btn:hover { background: #66CDAA; border-color: #4db89a; }
+.cmd-btn:active { transform: scale(0.97); }
+.cmd-btn.danger { color: var(--error); }
+.cmd-btn.danger:hover { background: #fdd; border-color: #eaa; }
 
-/* Action rows */
+/* Actions */
+.action-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
 .action-row {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-top: 8px;
+}
+.action-row label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    min-width: 90px;
+    flex-shrink: 0;
 }
 .action-row input {
-    width: 294px;
-    height: 36px;
-    padding: 0 8px;
-    border: 1px solid #ccc;
-    font-size: 0.95rem;
-    font-weight: bold;
-    color: #666;
+    flex: 1;
+    height: 34px;
+    padding: 0 10px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text);
+    min-width: 0;
+    outline: none;
 }
+.action-row input:focus { border-color: var(--blue); }
 .action-row button {
-    height: 36px;
-    padding: 0 14px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.status-bar {
-    margin-top: 10px;
+    height: 34px;
+    padding: 0 16px;
+    font-weight: 700;
     font-size: 0.85rem;
-    color: #555;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    background: var(--blue);
+    flex-shrink: 0;
+    transition: background 0.15s;
 }
-.status-bar.error { color: #c00; }
-.status-bar.success { color: #080; }
+.action-row button:hover { background: var(--blue-dark); }
 
 /* Log viewer modal */
 .log-modal {
@@ -259,7 +362,7 @@ body {
     background: #c00;
     border-color: #c00;
     color: #fff;
-    font-weight: bold;
+    font-weight: 700;
     margin-left: 12px;
 }
 .log-panel-header .close-btn:hover { background: #a00; }
@@ -282,10 +385,17 @@ body {
 </head>
 <body>
 
-<!-- Menu bar (always visible) -->
+<!-- Menu bar -->
 <div class="menu-bar">
-    <span class="app-title">Cisco Phone Controller</span>
+    <span class="app-title">Cisco Phone Controller <span class="version" id="app-version"></span></span>
+    <a href="https://github.com/rn-bord/cisco-phone-controller" target="_blank">GitHub</a>
     <button onclick="openLogs()">View Logs</button>
+</div>
+
+<!-- Status strip -->
+<div class="status-strip" id="status-strip">
+    <span class="dot"></span>
+    <span id="status-text">Ready</span>
 </div>
 
 <div class="content">
@@ -297,7 +407,7 @@ body {
         <label for="ip">Phone IP Address</label>
         <input type="text" id="ip" placeholder="e.g., 192.168.1.100" value="">
         <label for="username">Username</label>
-        <input type="text" id="username" placeholder="CUCM End User / Application User" value="">
+        <input type="text" id="username" placeholder="CUCM Application User" value="">
         <label for="password">Password</label>
         <input type="password" id="password" placeholder="Password" value="">
         <button id="btn-connect" onclick="doConnect()">Connect</button>
@@ -307,61 +417,79 @@ body {
 
 <!-- CONTROLLER VIEW -->
 <div id="controller-view">
-    <div class="header">
-        <h2>Cisco Phone Controller</h2>
-        <button onclick="doDisconnect()">Disconnect</button>
-    </div>
+    <div class="controller-grid">
 
-    <div class="main-layout">
-        <div class="left-col">
-            <div id="screen-wrap">
-                <img id="screen-img" src="" alt="Phone Screen" usemap="#screen-map">
-                <map name="screen-map" id="screen-map">
-                    <area shape="rect" coords="0,285,133,320"   title="Soft1"    onclick="sendKey('Soft1')">
-                    <area shape="rect" coords="134,285,267,320" title="Soft2"   onclick="sendKey('Soft2')">
-                    <area shape="rect" coords="268,285,401,320" title="Soft3"   onclick="sendKey('Soft3')">
-                    <area shape="rect" coords="402,285,533,320" title="Soft4"   onclick="sendKey('Soft4')">
-                    <area shape="rect" coords="0,45,266,90"     title="Line1"   onclick="sendKey('Line1')">
-                    <area shape="rect" coords="0,91,266,136"    title="Line2"   onclick="sendKey('Line2')">
-                    <area shape="rect" coords="0,137,266,182"   title="Line3"   onclick="sendKey('Line3')">
-                    <area shape="rect" coords="0,183,266,228"   title="Line4"   onclick="sendKey('Line4')">
-                    <area shape="rect" coords="0,229,266,274"   title="Line5"   onclick="sendKey('Line5')">
-                    <area shape="rect" coords="267,45,533,90"   title="Session1" onclick="sendKey('Session1')">
-                    <area shape="rect" coords="267,91,533,136"  title="Session2" onclick="sendKey('Session2')">
-                    <area shape="rect" coords="267,137,533,182" title="Session3" onclick="sendKey('Session3')">
-                    <area shape="rect" coords="267,183,533,228" title="Session4" onclick="sendKey('Session4')">
-                    <area shape="rect" coords="267,229,533,274" title="Session5" onclick="sendKey('Session5')">
-                </map>
+        <!-- Left: Phone + Keypad -->
+        <div class="phone-col">
+            <div class="card">
+                <div class="card-title">Phone Screen</div>
+                <div id="screen-wrap">
+                    <img id="screen-img" src="" alt="Phone Screen" usemap="#screen-map">
+                    <map name="screen-map" id="screen-map">
+                        <area shape="rect" coords="0,285,133,320"   title="Soft1"    onclick="sendKey('Soft1')">
+                        <area shape="rect" coords="134,285,267,320" title="Soft2"   onclick="sendKey('Soft2')">
+                        <area shape="rect" coords="268,285,401,320" title="Soft3"   onclick="sendKey('Soft3')">
+                        <area shape="rect" coords="402,285,533,320" title="Soft4"   onclick="sendKey('Soft4')">
+                        <area shape="rect" coords="0,45,266,90"     title="Line1"   onclick="sendKey('Line1')">
+                        <area shape="rect" coords="0,91,266,136"    title="Line2"   onclick="sendKey('Line2')">
+                        <area shape="rect" coords="0,137,266,182"   title="Line3"   onclick="sendKey('Line3')">
+                        <area shape="rect" coords="0,183,266,228"   title="Line4"   onclick="sendKey('Line4')">
+                        <area shape="rect" coords="0,229,266,274"   title="Line5"   onclick="sendKey('Line5')">
+                        <area shape="rect" coords="267,45,533,90"   title="Session1" onclick="sendKey('Session1')">
+                        <area shape="rect" coords="267,91,533,136"  title="Session2" onclick="sendKey('Session2')">
+                        <area shape="rect" coords="267,137,533,182" title="Session3" onclick="sendKey('Session3')">
+                        <area shape="rect" coords="267,183,533,228" title="Session4" onclick="sendKey('Session4')">
+                        <area shape="rect" coords="267,229,533,274" title="Session5" onclick="sendKey('Session5')">
+                    </map>
+                </div>
             </div>
-            <div class="status-bar" id="status">Connected.</div>
+            <div class="card">
+                <div class="card-title">Keypad</div>
+                <div class="keypad" id="keypad"></div>
+            </div>
         </div>
 
-        <div class="right-col">
-            <h3>Keypad</h3>
-            <div class="keypad" id="keypad"></div>
-
-            <h3 style="margin-top:20px">Command Centre</h3>
-            <div class="cmd-grid" id="cmd-grid"></div>
-
-            <h3 style="margin-top:20px">Actions</h3>
-            <div class="action-row">
-                <input type="text" id="inp-number" placeholder="E.g., A Dial Pattern">
-                <button onclick="doMakeCall()">Make Call</button>
+        <!-- Right: Commands + Actions -->
+        <div class="ctrl-col">
+            <div class="card">
+                <div class="card-title">Navigation</div>
+                <div class="cmd-grid" id="nav-grid"></div>
             </div>
-            <div class="action-row">
-                <input type="text" id="inp-macro" placeholder="E.g., Settings, Pause, KeyPad5">
-                <button onclick="doMacro()">Run Macro</button>
+            <div class="card">
+                <div class="card-title">Function Keys</div>
+                <div class="cmd-grid" id="func-grid"></div>
             </div>
-            <div class="action-row">
-                <input type="text" id="inp-mcast" placeholder="E.g., 239.1.1.13:20480">
-                <button onclick="doJoinAudio()">Join Audio</button>
-                <button onclick="doStopAudio()">Stop Audio</button>
+            <div class="card">
+                <div class="card-title">Actions</div>
+                <div class="action-group">
+                    <div class="action-row">
+                        <label>Make Call</label>
+                        <input type="text" id="inp-number" placeholder="Dial pattern">
+                        <button onclick="doMakeCall()">Dial</button>
+                    </div>
+                    <div class="action-row">
+                        <label>Macro</label>
+                        <input type="text" id="inp-macro" placeholder="Settings, Pause, KeyPad5">
+                        <button onclick="doMacro()">Run</button>
+                    </div>
+                    <div class="action-row">
+                        <label>Multicast</label>
+                        <input type="text" id="inp-mcast" placeholder="239.1.1.13:20480">
+                        <button onclick="doJoinAudio()">Join</button>
+                        <button onclick="doStopAudio()">Stop</button>
+                    </div>
+                    <div class="action-row">
+                        <label>Display Text</label>
+                        <input type="text" id="inp-display" placeholder="Message to show on phone">
+                        <button onclick="doDisplay()">Send</button>
+                    </div>
+                </div>
             </div>
-            <div class="action-row">
-                <input type="text" id="inp-display" placeholder="E.g., Good morning!">
-                <button onclick="doDisplay()">Display Text</button>
+            <div class="card" style="text-align: right;">
+                <button onclick="doDisconnect()" style="padding:8px 20px; border:1px solid var(--border); background:var(--card); border-radius:4px; cursor:pointer; font-weight:600; color:var(--error);">Disconnect</button>
             </div>
         </div>
+
     </div>
 </div>
 
@@ -386,16 +514,24 @@ body {
 // --- State ---
 let screenshotTimer = null;
 
+// --- Version ---
+fetch('/api/version').then(r => r.json()).then(d => {
+    document.getElementById('app-version').textContent = 'v' + d.version;
+}).catch(() => {});
+
+// --- Status ---
+function setStatus(msg, isError) {
+    const strip = document.getElementById('status-strip');
+    const text = document.getElementById('status-text');
+    text.textContent = msg;
+    strip.className = 'status-strip' + (isError ? ' error' : (msg.startsWith('Sent') ? ' success' : ''));
+}
+
 // --- Setup ---
 function showError(msg) {
     const el = document.getElementById('setup-error');
     el.textContent = msg;
     el.style.display = msg ? 'block' : 'none';
-}
-function setStatus(msg, isError) {
-    const el = document.getElementById('status');
-    el.textContent = msg;
-    el.className = 'status-bar' + (isError ? ' error' : ' success');
 }
 
 async function doConnect() {
@@ -418,20 +554,17 @@ async function doConnect() {
         fd.append('username', username);
         fd.append('password', password);
 
-        const r = await fetch('/api/connect', {
-            method: 'POST',
-            body: fd
-        });
+        const r = await fetch('/api/connect', { method: 'POST', body: fd });
         const data = await r.json().catch(() => ({}));
-        if (!r.ok) {
-            throw new Error(data.detail || `HTTP ${r.status}`);
-        }
-        // Switch views
+        if (!r.ok) throw new Error(data.detail || `HTTP ${r.status}`);
+
         document.getElementById('setup-view').style.display = 'none';
         document.getElementById('controller-view').style.display = 'block';
+        setStatus('Connected to ' + ip);
         startScreenshotLoop();
     } catch (e) {
         showError(e.message || 'Connection failed.');
+        setStatus('Connection failed', true);
     } finally {
         btn.disabled = false;
         btn.textContent = 'Connect';
@@ -442,19 +575,17 @@ async function doDisconnect() {
     try { await fetch('/api/disconnect', {method: 'POST'}); } catch(e) {}
     stopScreenshotLoop();
     document.getElementById('controller-view').style.display = 'none';
-    document.getElementById('setup-view').style.display = 'block';
-    // Clear fields
+    document.getElementById('setup-view').style.display = 'flex';
     document.getElementById('ip').value = '';
     document.getElementById('username').value = '';
     document.getElementById('password').value = '';
     showError('');
+    setStatus('Ready');
 }
 
 // --- Screenshot ---
 function refreshScreenshot() {
-    const img = document.getElementById('screen-img');
-    const ts = Date.now();
-    img.src = '/api/screenshot?id=' + ts;
+    document.getElementById('screen-img').src = '/api/screenshot?id=' + Date.now();
 }
 function startScreenshotLoop() {
     refreshScreenshot();
@@ -465,43 +596,56 @@ function stopScreenshotLoop() {
 }
 
 // --- Keypad generation ---
-const keypadIds = [
-    'KeyPad1','KeyPad2','KeyPad3',
-    'KeyPad4','KeyPad5','KeyPad6',
-    'KeyPad7','KeyPad8','KeyPad9',
-    'KeyPadStar','KeyPad0','KeyPadPound'
-];
-const keypadLabels = [
-    '1','2','3','4','5','6','7','8','9',
-    '*','0','#'
-];
+const keypadIds = ['KeyPad1','KeyPad2','KeyPad3','KeyPad4','KeyPad5','KeyPad6','KeyPad7','KeyPad8','KeyPad9','KeyPadStar','KeyPad0','KeyPadPound'];
+const keypadLabels = ['1','2','3','4','5','6','7','8','9','*','0','#'];
 const keypadContainer = document.getElementById('keypad');
 keypadIds.forEach((id, i) => {
     const div = document.createElement('div');
     div.className = 'keypad-btn';
     div.textContent = keypadLabels[i];
-    if (id === 'KeyPadStar') div.style.fontSize = '1.3rem';
     div.onclick = () => sendKey(id);
     keypadContainer.appendChild(div);
 });
 
-// --- Command Centre generation ---
-const cmdButtons = [
-    'Messages','NavUp','Directories','VolUp',
-    'Buzz','NavLeft','NavSelect','NavRight','VolDwn',
-    'Unlock','NavBack','NavDwn','Applications','Settings',
-    'Reset','Speaker','Headset','Mute'
+// --- Navigation grid (D-pad + feature keys) ---
+const navButtons = [
+    { label: '▲',     key: 'NavUp' },
+    { label: 'Select', key: 'NavSelect' },
+    { label: '▼',     key: 'NavDwn' },
+    { label: '◄',     key: 'NavLeft' },
+    { label: 'Back',  key: 'NavBack' },
+    { label: '►',     key: 'NavRight' },
+    { label: 'Vol ▲',  key: 'VolUp' },
+    { label: 'Vol ▼',  key: 'VolDwn' },
 ];
-const cmdGrid = document.getElementById('cmd-grid');
-cmdButtons.forEach(label => {
+const navGrid = document.getElementById('nav-grid');
+navButtons.forEach(b => {
     const div = document.createElement('div');
     div.className = 'cmd-btn';
-    div.textContent = label;
-    if (label === 'Buzz') {
-        div.style.background = '#ffdddd';
-    }
-    div.onclick = () => handleCmd(label);
-    cmdGrid.appendChild(div);
+    div.textContent = b.label;
+    div.onclick = () => sendKey(b.key);
+    navGrid.appendChild(div);
+});
+
+// --- Function keys grid ---
+const funcButtons = [
+    { label: 'Messages',     key: 'Messages' },
+    { label: 'Directories',  key: 'Directories' },
+    { label: 'Applications', key: 'Applications' },
+    { label: 'Settings',     key: 'Settings' },
+    { label: 'Speaker',      key: 'Speaker' },
+    { label: 'Headset',      key: 'Headset' },
+    { label: 'Mute',         key: 'Mute' },
+    { label: 'Buzz',         key: 'Buzz',    danger: true },
+    { label: 'Unlock',       key: 'Unlock',  danger: true },
+];
+const funcGrid = document.getElementById('func-grid');
+funcButtons.forEach(b => {
+    const div = document.createElement('div');
+    div.className = 'cmd-btn' + (b.danger ? ' danger' : '');
+    div.textContent = b.label;
+    div.onclick = () => handleCmd(b.key, b.label);
+    funcGrid.appendChild(div);
 });
 
 // --- XML Templates ---
@@ -513,13 +657,10 @@ const XML_MCAST_STOP = '<CiscoIPPhoneExecute><ExecuteItem URL="RTPMRx:Stop" /></
 const XML_DISPLAY = '<CiscoIPPhoneText><Title>Informational Message</Title><Prompt></Prompt><Text>%MSG%</Text></CiscoIPPhoneText>';
 
 // --- Command dispatch ---
-function handleCmd(id) {
-    switch(id) {
-        case 'Buzz': return sendXml(XML_BUZZ, 'Buzzing...');
-        case 'Unlock': return setStatus('Unlock not implemented', true);
-        case 'Reset':  return setStatus('Reset not implemented', true);
-        default: return sendKey(id);
-    }
+function handleCmd(id, label) {
+    if (id === 'Buzz') return sendXml(XML_BUZZ, 'Buzz');
+    if (id === 'Unlock') return setStatus('Unlock not implemented', true);
+    return sendKey(id);
 }
 
 async function sendKey(key) {
@@ -532,21 +673,16 @@ async function sendXml(xml, desc) {
         setStatus('Sending: ' + desc + '...');
         const fd = new URLSearchParams();
         fd.append('xml', xml);
-        const r = await fetch('/api/execute', {
-            method: 'POST',
-            body: fd
-        });
+        const r = await fetch('/api/execute', { method: 'POST', body: fd });
         const data = await r.json().catch(() => ({}));
-        if (!r.ok) {
-            throw new Error(data.detail || `HTTP ${r.status}`);
-        }
+        if (!r.ok) throw new Error(data.detail || `HTTP ${r.status}`);
         setStatus('Sent: ' + desc + ' (HTTP ' + data.status + ')');
         // Refresh screenshot sooner
-        clearTimeout(screenshotTimer);
+        clearInterval(screenshotTimer);
         screenshotTimer = setInterval(refreshScreenshot, 6000);
         setTimeout(refreshScreenshot, 750);
     } catch (e) {
-        setStatus('Error: ' + (e.message || 'Failed to send command'), true);
+        setStatus('Error: ' + (e.message || 'Failed'), true);
     }
 }
 
@@ -554,8 +690,7 @@ async function sendXml(xml, desc) {
 async function doMakeCall() {
     const num = document.getElementById('inp-number').value.trim();
     if (!num) return setStatus('Enter a number first.', true);
-    const xml = XML_CALL.replace('%NUMBER%', num.replace(/\+/g, '%2B'));
-    await sendXml(xml, 'Make Call ' + num);
+    await sendXml(XML_CALL.replace('%NUMBER%', num.replace(/\+/g, '%2B')), 'Dial ' + num);
 }
 
 async function doMacro() {
@@ -577,8 +712,7 @@ async function doMacro() {
 async function doJoinAudio() {
     const addr = document.getElementById('inp-mcast').value.trim();
     if (!addr) return setStatus('Enter a multicast address first.', true);
-    const xml = XML_MCAST.replace('%ADDRESS%', addr);
-    await sendXml(xml, 'Join Audio ' + addr);
+    await sendXml(XML_MCAST.replace('%ADDRESS%', addr), 'Join Audio ' + addr);
 }
 
 async function doStopAudio() {
@@ -588,8 +722,7 @@ async function doStopAudio() {
 async function doDisplay() {
     const msg = document.getElementById('inp-display').value.trim();
     if (!msg) return setStatus('Enter text first.', true);
-    const xml = XML_DISPLAY.replace('%MSG%', msg);
-    await sendXml(xml, 'Display: ' + msg);
+    await sendXml(XML_DISPLAY.replace('%MSG%', msg), 'Display: ' + msg);
 }
 
 // --- Log viewer ---
@@ -605,21 +738,13 @@ async function refreshLogs() {
         const r = await fetch('/api/logs?count=500');
         const data = await r.json();
         const container = document.getElementById('log-content');
-        // Remember scroll position
         const wasAtBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 30;
-        const oldScrollHeight = container.scrollHeight;
-
         container.innerHTML = data.logs.map(line => {
-            // Parse level from log line: "2026-06-10 ... | INFO | ..."
             const levelMatch = line.match(/\|\s*(DEBUG|INFO|WARNING|ERROR)\s*\|/);
             const level = levelMatch ? levelMatch[1] : '';
             return `<div class="log-line ${level}">${escapeHtml(line)}</div>`;
         }).join('');
-
-        // Auto-scroll to bottom if user was already there
-        if (wasAtBottom) {
-            container.scrollTop = container.scrollHeight;
-        }
+        if (wasAtBottom) container.scrollTop = container.scrollHeight;
     } catch(e) {
         document.getElementById('log-content').textContent = 'Failed to load logs: ' + e.message;
     }

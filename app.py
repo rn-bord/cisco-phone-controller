@@ -15,6 +15,8 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import StreamingResponse, JSONResponse, Response
 
+VERSION = "1.1.0-dev"
+
 # Determine base path (works both as script and frozen .exe)
 # In PyInstaller onefile mode, bundled files live in sys._MEIPASS (temp extraction dir)
 # The exe itself lives at sys.executable, but static/ etc are in _MEIPASS
@@ -109,6 +111,10 @@ HTTPX_KWARGS = dict(
 @app.get("/")
 async def index(request: Request):
     return templates.TemplateResponse(request, "index.html")
+
+@app.get("/api/version")
+async def get_version():
+    return {"version": VERSION}
 
 @app.get("/api/logs")
 async def get_logs(count: int = 100):
